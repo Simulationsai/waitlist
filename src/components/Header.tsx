@@ -1,7 +1,7 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import logoUrl from '../assets/simulationsai-logo.png'
-import { getUser, isAuthenticated, logout } from '../lib/auth'
 import { useEffect, useRef, useState } from 'react'
+import { useAuth } from './authContext'
 
 function NavItem({ to, label }: { to: string; label: string }) {
   return (
@@ -15,9 +15,8 @@ function NavItem({ to, label }: { to: string; label: string }) {
 }
 
 export function Header() {
-  const authed = isAuthenticated()
   const navigate = useNavigate()
-  const user = getUser()
+  const { user, logout } = useAuth()
   const displayName = user?.displayName || 'Profile'
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement | null>(null)
@@ -46,7 +45,7 @@ export function Header() {
           <NavItem to="/how-it-works" label="How it works" />
           <NavItem to="/airdrop" label="Eligibility" />
           <NavItem to="/waitlist" label="Waitlist" />
-          {!authed ? (
+          {!user ? (
             <NavItem to="/login" label="Login" />
           ) : (
             <>
@@ -80,8 +79,7 @@ export function Header() {
                       role="menuitem"
                       onClick={() => {
                         setOpen(false)
-                        logout()
-                        navigate('/', { replace: true })
+                        logout().finally(() => navigate('/', { replace: true }))
                       }}
                     >
                       Log out

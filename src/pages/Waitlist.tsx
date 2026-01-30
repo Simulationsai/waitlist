@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { getApiBase } from '../lib/api'
 
 export function Waitlist() {
   const [email, setEmail] = useState('')
@@ -15,7 +16,7 @@ export function Waitlist() {
     setError(null)
     setSubmitted(false)
 
-    const apiBase = (import.meta as { env?: Record<string, string> }).env?.VITE_API_BASE_URL
+    const apiBase = getApiBase()
     try {
       if (apiBase) {
         const res = await fetch(`${apiBase.replace(/\/$/, '')}/waitlist`, {

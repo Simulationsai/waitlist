@@ -1,40 +1,27 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { setAuthenticated, setUser } from '../lib/auth'
+import { getApiBase } from '../lib/api'
+import { startDiscordLogin, startGoogleLogin, verifyWallet, getWalletNonce } from '../lib/sessionAuth'
+import { useAuth } from '../components/authContext'
 
 export function Login() {
-  const [email, setEmail] = useState('')
-  const [mode, setMode] = useState<'email' | 'discord' | 'wallet'>('email')
-  const [discordUsername, setDiscordUsername] = useState('')
-  const [walletAddress, setWalletAddress] = useState('')
+  const [walletError, setWalletError] = useState<string | null>(null)
+  const [walletBusy, setWalletBusy] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
   const redirectTo = (location.state as { from?: string } | null)?.from ?? '/app'
+  const { user, refresh } = useAuth()
 
-  const finish = (displayName: string, emailValue?: string) => {
-    setAuthenticated(true)
-    setUser({ displayName, email: emailValue })
+  if (user) {
     navigate(redirectTo, { replace: true })
+    return null
   }
 
-  const onSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    if (mode === 'email') {
-      const name = email.trim().split('@')[0] || 'Participant'
-      finish(name, email.trim())
-      return
-    }
+  const apiBase = getApiBase()
+  const oauthEnabled = Boolean(apiBase)
 
-    if (mode === 'discord') {
-      const u = discordUsername.trim().replace(/^@/, '')
-      const name = u ? `@${u}` : 'Discord user'
-      finish(name, email.trim() || undefined)
-      return
-    }
-
-    const w = walletAddress.trim()
-    const name = w ? `${w.slice(0, 6)}…${w.slice(-4)}` : 'Wallet user'
-    finish(name)
+  type EthereumProvider = {
+    request: (args: { method: string; params?: unknown[] }) => Promise<unknown>
   }
 
   return (
@@ -47,117 +34,103 @@ export function Login() {
           </div>
           <h1 className="h1">Access Your Account</h1>
           <p className="p">
-            Participation features are subject to availability and access level. This demo uses
-            local-only login to enable navigation.
+            Sign in to access participation pages. Without a valid session, dashboard and app pages
+            are not accessible.
           </p>
         </div>
 
         <div className="grid cols-2" style={{ marginTop: 18 }}>
           <div className="card">
             <div className="card-inner">
-              <div className="h2">
-                {mode === 'email'
-                  ? 'Email login'
-                  : mode === 'discord'
-                    ? 'Discord login'
-                    : 'Wallet login'}
+              <div className="h2">OAuth login</div>
+              <p className="p">
+                Continue with an identity provider. If a provider is not configured, the button will
+                not work until environment variables are set.
+              </p>
+              <div className="btn-row">
+                <button
+                  className="btn btn-primary"
+                  type="button"
+                  disabled={!oauthEnabled}
+                  onClick={() => startGoogleLogin()}
+                >
+                  Continue with Google
+                </button>
+                <button
+                  className="btn btn-secondary"
+                  type="button"
+                  disabled={!oauthEnabled}
+                  onClick={() => startDiscordLogin()}
+                >
+                  Continue with Discord
+                </button>
               </div>
-              <form onSubmit={onSubmit} className="form">
-                {mode === 'email' ? (
-                  <label className="label">
-                    Email
-                    <input
-                      className="input"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="name@domain.com"
-                      required
-                    />
-                  </label>
-                ) : null}
 
-                {mode === 'discord' ? (
-                  <>
-                    <label className="label">
-                      Discord username
-                      <input
-                        className="input"
-                        value={discordUsername}
-                        onChange={(e) => setDiscordUsername(e.target.value)}
-                        placeholder="username"
-                        inputMode="text"
-                        required
-                      />
-                    </label>
-                    <label className="label">
-                      Email (optional)
-                      <input
-                        className="input"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="name@domain.com"
-                      />
-                    </label>
-                    <p className="p muted-2" style={{ fontSize: 13 }}>
-                      Note: This demo does not perform Discord OAuth. It records a local session for
-                      navigation.
-                    </p>
-                  </>
-                ) : null}
-
-                {mode === 'wallet' ? (
-                  <>
-                    <label className="label">
-                      Wallet address
-                      <input
-                        className="input"
-                        value={walletAddress}
-                        onChange={(e) => setWalletAddress(e.target.value)}
-                        placeholder="0x…"
-                        inputMode="text"
-                        required
-                      />
-                    </label>
-                    <p className="p muted-2" style={{ fontSize: 13 }}>
-                      Note: This demo does not connect to a wallet provider. It records a local
-                      session for navigation.
-                    </p>
-                  </>
-                ) : null}
-                <div className="btn-row">
-                  <button className="btn btn-primary" type="submit">
-                    Continue
-                  </button>
-                </div>
-              </form>
+              {!oauthEnabled ? (
+                <p className="p muted-2" style={{ marginTop: 12, fontSize: 13 }}>
+                  OAuth is not configured. Set <code>VITE_API_BASE_URL</code> in Vercel and
+                  <code>FRONTEND_ORIGIN</code> plus provider keys in Render.
+                </p>
+              ) : null}
             </div>
           </div>
 
           <div className="card">
             <div className="card-inner">
-              <div className="h2">Other options</div>
-              <p className="p">Wallet and Discord login can be offered based on access level.</p>
+              <div className="h2">Wallet login</div>
+              <p className="p">
+                Sign a one-time message with your wallet to create a session. This does not perform
+                transactions.
+              </p>
+
               <div className="btn-row">
                 <button
                   className="btn btn-secondary"
                   type="button"
-                  onClick={() => setMode('wallet')}
+                  disabled={!oauthEnabled || walletBusy}
+                  onClick={async () => {
+                    setWalletError(null)
+                    setWalletBusy(true)
+                    try {
+                      if (!oauthEnabled) throw new Error('API is not configured')
+                      const eth = (window as unknown as { ethereum?: EthereumProvider }).ethereum
+                      if (!eth) throw new Error('No wallet provider detected')
+
+                      const accounts = (await eth.request({
+                        method: 'eth_requestAccounts',
+                      })) as string[]
+                      const address = accounts?.[0]
+                      if (!address) throw new Error('Wallet connection was not approved')
+
+                      const { message } = await getWalletNonce()
+                      const signature = (await eth.request({
+                        method: 'personal_sign',
+                        params: [message, address],
+                      })) as string
+
+                      await verifyWallet(address, signature)
+                      await refresh()
+                      navigate(redirectTo, { replace: true })
+                    } catch (e) {
+                      setWalletError(e instanceof Error ? e.message : 'Wallet login failed')
+                    } finally {
+                      setWalletBusy(false)
+                    }
+                  }}
                 >
-                  Wallet login
-                </button>
-                <button
-                  className="btn btn-secondary"
-                  type="button"
-                  onClick={() => setMode('discord')}
-                >
-                  Discord login
+                  {walletBusy ? 'Connecting…' : 'Continue with Wallet'}
                 </button>
               </div>
-              <div style={{ height: 12 }} />
+
+              {walletError ? (
+                <div className="notice" role="status">
+                  {walletError}
+                </div>
+              ) : null}
+
               <p className="p muted-2" style={{ fontSize: 13 }}>
-                XP reflects participation only. Mechanisms may be updated as the system evolves.
+                Note: A valid session is required to access participation features. XP reflects
+                participation only. Mechanisms may be updated as the system evolves.
               </p>
             </div>
           </div>
