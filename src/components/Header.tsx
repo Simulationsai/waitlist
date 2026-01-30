@@ -19,6 +19,7 @@ export function Header() {
   const { user, logout } = useAuth()
   const displayName = user?.displayName || 'Profile'
   const [open, setOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -30,6 +31,15 @@ export function Header() {
     return () => window.removeEventListener('mousedown', onDown)
   }, [])
 
+  useEffect(() => {
+    if (!mobileOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [mobileOpen])
+
   return (
     <header className="site-header">
       <div className="container site-header-inner">
@@ -37,6 +47,16 @@ export function Header() {
           <img className="brand-logo" src={logoUrl} alt="SimulationsAI logo" />
           <span className="brand-name">SimulationsAI</span>
         </Link>
+
+        <button
+          type="button"
+          className="nav-toggle"
+          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileOpen}
+          onClick={() => setMobileOpen((v) => !v)}
+        >
+          <span className="nav-toggle-icon" aria-hidden="true" />
+        </button>
 
         <nav className="nav">
           <NavItem to="/" label="Home" />
@@ -91,6 +111,92 @@ export function Header() {
           )}
         </nav>
       </div>
+
+      {mobileOpen ? (
+        <div
+          className="mobile-nav-overlay"
+          role="presentation"
+          onClick={() => setMobileOpen(false)}
+        >
+          <div className="mobile-nav" role="dialog" aria-label="Navigation" aria-modal="true">
+            <div className="mobile-nav-head">
+              <div className="mobile-brand">
+                <img className="brand-logo" src={logoUrl} alt="SimulationsAI logo" />
+                <div>
+                  <div className="mobile-brand-name">SimulationsAI</div>
+                  <div className="muted-2" style={{ fontSize: 12 }}>
+                    Menu
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="nav-link nav-link-button"
+                onClick={() => setMobileOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="mobile-nav-links">
+              <NavLink to="/" className="mobile-link" onClick={() => setMobileOpen(false)}>
+                Home
+              </NavLink>
+              <NavLink to="/vision" className="mobile-link" onClick={() => setMobileOpen(false)}>
+                Vision
+              </NavLink>
+              <NavLink to="/roadmap" className="mobile-link" onClick={() => setMobileOpen(false)}>
+                Roadmap
+              </NavLink>
+              <NavLink
+                to="/how-it-works"
+                className="mobile-link"
+                onClick={() => setMobileOpen(false)}
+              >
+                How it works
+              </NavLink>
+              <NavLink to="/airdrop" className="mobile-link" onClick={() => setMobileOpen(false)}>
+                Eligibility
+              </NavLink>
+              <NavLink to="/waitlist" className="mobile-link" onClick={() => setMobileOpen(false)}>
+                Waitlist
+              </NavLink>
+              {!user ? (
+                <NavLink to="/login" className="mobile-link" onClick={() => setMobileOpen(false)}>
+                  Login
+                </NavLink>
+              ) : (
+                <>
+                  <NavLink
+                    to="/app/dashboard"
+                    className="mobile-link"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Dashboard
+                  </NavLink>
+                  <NavLink
+                    to="/app/settings"
+                    className="mobile-link"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Settings
+                  </NavLink>
+                  <button
+                    type="button"
+                    className="mobile-link mobile-link-button"
+                    onClick={() => {
+                      setMobileOpen(false)
+                      logout().finally(() => navigate('/', { replace: true }))
+                    }}
+                  >
+                    Log out ({displayName})
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </header>
   )
 }

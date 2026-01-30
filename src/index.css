@@ -306,6 +306,112 @@ a:hover {
   justify-content: flex-end;
 }
 
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--text);
+}
+
+.nav-toggle-icon {
+  width: 18px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.86);
+  border-radius: 999px;
+  position: relative;
+}
+
+.nav-toggle-icon::before,
+.nav-toggle-icon::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 18px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.86);
+  border-radius: 999px;
+}
+
+.nav-toggle-icon::before {
+  top: -6px;
+}
+
+.nav-toggle-icon::after {
+  top: 6px;
+}
+
+.mobile-nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  z-index: 60;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mobile-nav {
+  width: min(88vw, 360px);
+  height: 100%;
+  border-left: 1px solid var(--border);
+  background: rgba(7, 10, 13, 0.92);
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+
+.mobile-nav-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mobile-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobile-brand-name {
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+.mobile-nav-links {
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+}
+
+.mobile-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--text);
+  font-weight: 800;
+}
+
+.mobile-link:hover {
+  border-color: var(--border-strong);
+}
+
+.mobile-link-button {
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
 .nav-link {
   display: inline-flex;
   align-items: center;
@@ -574,6 +680,41 @@ a:hover {
 .hero-sub {
   font-size: 17px;
   max-width: 62ch;
+}
+
+/* Mobile layout tweaks */
+@media (max-width: 860px) {
+  .nav {
+    display: none;
+  }
+  .nav-toggle {
+    display: inline-flex;
+  }
+  .brand {
+    min-width: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .container {
+    padding: 0 14px;
+  }
+  .hero-dev {
+    padding: 22px 14px;
+  }
+  .hero-tag {
+    display: none;
+  }
+  .btn-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn {
+    width: 100%;
+  }
+  .kpi-value {
+    font-size: 20px;
+  }
 }
 
 .hero-card {
