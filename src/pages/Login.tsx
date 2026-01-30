@@ -4,6 +4,9 @@ import { setAuthenticated, setUser } from '../lib/auth'
 
 export function Login() {
   const [email, setEmail] = useState('')
+  const [mode, setMode] = useState<'email' | 'discord' | 'wallet'>('email')
+  const [discordUsername, setDiscordUsername] = useState('')
+  const [walletAddress, setWalletAddress] = useState('')
   const navigate = useNavigate()
   const location = useLocation()
   const redirectTo = (location.state as { from?: string } | null)?.from ?? '/app'
@@ -16,8 +19,22 @@ export function Login() {
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault()
-    const name = email.trim().split('@')[0] || 'Participant'
-    finish(name, email.trim())
+    if (mode === 'email') {
+      const name = email.trim().split('@')[0] || 'Participant'
+      finish(name, email.trim())
+      return
+    }
+
+    if (mode === 'discord') {
+      const u = discordUsername.trim().replace(/^@/, '')
+      const name = u ? `@${u}` : 'Discord user'
+      finish(name, email.trim() || undefined)
+      return
+    }
+
+    const w = walletAddress.trim()
+    const name = w ? `${w.slice(0, 6)}…${w.slice(-4)}` : 'Wallet user'
+    finish(name)
   }
 
   return (
@@ -38,19 +55,77 @@ export function Login() {
         <div className="grid cols-2" style={{ marginTop: 18 }}>
           <div className="card">
             <div className="card-inner">
-              <div className="h2">Email login</div>
+              <div className="h2">
+                {mode === 'email'
+                  ? 'Email login'
+                  : mode === 'discord'
+                    ? 'Discord login'
+                    : 'Wallet login'}
+              </div>
               <form onSubmit={onSubmit} className="form">
-                <label className="label">
-                  Email
-                  <input
-                    className="input"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@domain.com"
-                    required
-                  />
-                </label>
+                {mode === 'email' ? (
+                  <label className="label">
+                    Email
+                    <input
+                      className="input"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="name@domain.com"
+                      required
+                    />
+                  </label>
+                ) : null}
+
+                {mode === 'discord' ? (
+                  <>
+                    <label className="label">
+                      Discord username
+                      <input
+                        className="input"
+                        value={discordUsername}
+                        onChange={(e) => setDiscordUsername(e.target.value)}
+                        placeholder="username"
+                        inputMode="text"
+                        required
+                      />
+                    </label>
+                    <label className="label">
+                      Email (optional)
+                      <input
+                        className="input"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="name@domain.com"
+                      />
+                    </label>
+                    <p className="p muted-2" style={{ fontSize: 13 }}>
+                      Note: This demo does not perform Discord OAuth. It records a local session for
+                      navigation.
+                    </p>
+                  </>
+                ) : null}
+
+                {mode === 'wallet' ? (
+                  <>
+                    <label className="label">
+                      Wallet address
+                      <input
+                        className="input"
+                        value={walletAddress}
+                        onChange={(e) => setWalletAddress(e.target.value)}
+                        placeholder="0x…"
+                        inputMode="text"
+                        required
+                      />
+                    </label>
+                    <p className="p muted-2" style={{ fontSize: 13 }}>
+                      Note: This demo does not connect to a wallet provider. It records a local
+                      session for navigation.
+                    </p>
+                  </>
+                ) : null}
                 <div className="btn-row">
                   <button className="btn btn-primary" type="submit">
                     Continue
@@ -68,14 +143,14 @@ export function Login() {
                 <button
                   className="btn btn-secondary"
                   type="button"
-                  onClick={() => finish('Wallet user')}
+                  onClick={() => setMode('wallet')}
                 >
                   Wallet login
                 </button>
                 <button
                   className="btn btn-secondary"
                   type="button"
-                  onClick={() => finish('Discord user')}
+                  onClick={() => setMode('discord')}
                 >
                   Discord login
                 </button>
