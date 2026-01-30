@@ -4,84 +4,129 @@ export function Landing() {
   return (
     <div className="page">
       <div className="container">
-        <div className="hero">
-          <div>
+        <div className="hero hero-dev">
+          <div className="hero-bg" aria-hidden="true">
+            <div className="hero-grid" />
+            <div className="hero-lines" />
+            <div className="hero-glow" />
+          </div>
+
+          <div className="hero-left">
             <div className="eyebrow">
               <span className="dot" aria-hidden="true" />
-              Distributed participation
+              SimulationsAI
+              <span className="hero-tag">[ The Infrastructure of Tomorrow ]</span>
             </div>
-            <h1 className="h1">A New Way to Participate in Distributed Infrastructure</h1>
+
+            <h1 className="h1 hero-title">
+              The Decentralized Coordination Layer for Real-Time AI Environments.
+            </h1>
+
             <p className="p hero-sub">
-              SimulationsAI enables individuals to contribute compute and simulation capacity
-              in a structured, transparent, and progressive manner.
+              SimulationsAI provides a high-performance, distributed simulation framework designed
+              to power the next generation of AI-driven execution environments. We bridge the gap
+              between raw compute and intelligent application.
             </p>
 
             <div className="btn-row">
               <Link className="btn btn-primary" to="/waitlist">
-                Join the Early Access Waitlist
+                🛰️ ENTER ALPHA
               </Link>
-              <Link className="btn btn-secondary" to="/how-it-works">
-                Learn How It Works
+              <Link className="btn btn-secondary" to="/litepaper">
+                📄 READ LITEPAPER
               </Link>
             </div>
 
-            <div className="hero-bullets">
-              <div className="hero-bullet">
-                <div className="hero-bullet-title">Participation is earned</div>
-                <div className="muted">Through measurable contribution and reliability.</div>
-              </div>
-              <div className="hero-bullet">
-                <div className="hero-bullet-title">Access is unlocked gradually</div>
-                <div className="muted">Progression reflects demonstrated participation.</div>
-              </div>
-              <div className="hero-bullet">
-                <div className="hero-bullet-title">Rules evolve responsibly</div>
-                <div className="muted">Mechanisms may be updated as the system matures.</div>
+            <div className="card hero-card" style={{ marginTop: 18 }}>
+              <div className="card-inner">
+                <div className="card-title">
+                  <div className="h2" style={{ margin: 0 }}>
+                    Network Statistics
+                  </div>
+                  <span className="badge">Live</span>
+                </div>
+
+                <div className="grid cols-3">
+                  <div className="kpi">
+                    <div className="kpi-label">Uptime</div>
+                    <div className="kpi-value">99.9%</div>
+                    <div className="muted-2" style={{ marginTop: 6, fontSize: 12 }}>
+                      [TRACKING]
+                    </div>
+                  </div>
+                  <div className="kpi">
+                    <div className="kpi-label">Nodes Active</div>
+                    <div className="kpi-value">—</div>
+                    <div className="muted-2" style={{ marginTop: 6, fontSize: 12 }}>
+                      [PROCESSING]
+                    </div>
+                  </div>
+                  <div className="kpi">
+                    <div className="kpi-label">Simulations Executed</div>
+                    <div className="kpi-value">—</div>
+                    <div className="muted-2" style={{ marginTop: 6, fontSize: 12 }}>
+                      Rolling counter
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="card hero-card">
-            <div className="card-inner">
-              <div className="card-title">
-                <div>
+          <div className="hero-right">
+            <div className="card hero-card">
+              <div className="card-inner">
+                <div className="card-title">
                   <div className="h2" style={{ margin: 0 }}>
-                    Participation at a glance
+                    Core Pillars
                   </div>
-                  <div className="muted" style={{ marginTop: 6 }}>
-                    A structured path from contribution to access.
-                  </div>
+                  <span className="badge badge-accent">Structure</span>
                 </div>
-                <span className="badge badge-accent">Read-only</span>
-              </div>
 
-              <div className="grid" style={{ marginTop: 14 }}>
-                <div className="kpi">
-                  <div className="kpi-label">Contribution</div>
-                  <div className="kpi-value">Measured</div>
-                  <div className="muted-2" style={{ marginTop: 6, fontSize: 12 }}>
-                    Based on capacity, uptime, and validation rules.
+                <div className="grid" style={{ marginTop: 12 }}>
+                  <div className="hero-bullet">
+                    <div className="hero-bullet-title">Decentralized Intelligence</div>
+                    <div className="muted">
+                      No single point of failure. A globally distributed network of Lite and Ultra
+                      nodes.
+                    </div>
+                  </div>
+                  <div className="hero-bullet">
+                    <div className="hero-bullet-title">Contribution-First</div>
+                    <div className="muted">
+                      Participation is earned through uptime and task validation, measured by
+                      non-transferable XP.
+                    </div>
+                  </div>
+                  <div className="hero-bullet">
+                    <div className="hero-bullet-title">AI-Monitored Integrity</div>
+                    <div className="muted">
+                      An automated layer detects anomalies and supports fair resource distribution
+                      in real-time.
+                    </div>
                   </div>
                 </div>
-                <div className="kpi">
-                  <div className="kpi-label">XP</div>
-                  <div className="kpi-value">Internal signal</div>
-                  <div className="muted-2" style={{ marginTop: 6, fontSize: 12 }}>
-                    Non-transferable and subject to change.
-                  </div>
-                </div>
-                <div className="kpi">
-                  <div className="kpi-label">Access</div>
-                  <div className="kpi-value">Progressive</div>
-                  <div className="muted-2" style={{ marginTop: 6, fontSize: 12 }}>
-                    Contribution methods vary by level.
-                  </div>
-                </div>
-                <div className="kpi">
-                  <div className="kpi-label">Governance</div>
-                  <div className="kpi-value">Planned</div>
-                  <div className="muted-2" style={{ marginTop: 6, fontSize: 12 }}>
-                    Potential future access, if introduced.
+
+                <div className="card" style={{ marginTop: 14, boxShadow: 'none' }}>
+                  <div className="card-inner">
+                    <div className="h2" style={{ marginBottom: 8 }}>
+                      Join the Evolution
+                    </div>
+                    <p className="p">
+                      Early followers shape the network. Get priority access to Alpha testing and
+                      early-stage network incentives.
+                    </p>
+                    <p className="p muted-2" style={{ marginTop: 10, fontSize: 13 }}>
+                      Stay Early.
+                    </p>
+                    <div className="btn-row" style={{ marginTop: 14 }}>
+                      <Link className="btn btn-primary" to="/waitlist">
+                        Join waitlist
+                      </Link>
+                      <Link className="btn btn-secondary" to="/how-it-works">
+                        How it works
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>

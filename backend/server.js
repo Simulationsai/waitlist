@@ -28,6 +28,13 @@ app.use(
 )
 app.use(express.json({ limit: '200kb' }))
 
+app.get('/', (_req, res) => {
+  res
+    .status(200)
+    .type('text/plain')
+    .send('SimulationsAI backend is running. Use /health for status checks.')
+})
+
 async function ensureSchema() {
   if (!pool) return
   await pool.query(`
